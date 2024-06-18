@@ -1,0 +1,19 @@
+{
+  "name": "com.ig.UIFramework",
+  "version": "0.1.0",
+  "displayName": "ig.UIFramework",
+  "description": "issue game lib.UIFramework",
+  "keywords": [
+    "ig",
+    "ig lib",
+    "UIFramework"
+  ],
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "author": {
+    "name": "issuegame caleb",
+    "url": ""
+  },
+  "type": "library",
+  "dependencies": {}
+}
