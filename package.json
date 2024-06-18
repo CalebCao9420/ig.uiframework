@@ -1,12 +1,12 @@
 {
-  "name": "com.ig.UIFramework",
+  "name": "com.ig.uiframework",
   "version": "0.1.0",
-  "displayName": "ig.UIFramework",
-  "description": "issue game lib.UIFramework",
+  "displayName": "ig.uiframework",
+  "description": "issue game lib.uiframework",
   "keywords": [
     "ig",
     "ig lib",
-    "UIFramework"
+    "uiframework"
   ],
   "documentationUrl": "",
   "changelogUrl": "",
