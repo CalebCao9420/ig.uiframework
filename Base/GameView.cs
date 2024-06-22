@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using IG.AssetBundle;
+using IG.Attribute;
 using IG.Events;
 using IG.IO;
 using IG.Runtime.Log;
@@ -14,7 +15,6 @@ namespace IG.Module.UI{
         /// The move in time.
         /// </summary>
         // public float MoveInTime = 0.3f;
-
         /// <summary>
         /// The move out time.
         /// </summary>
@@ -98,7 +98,6 @@ namespace IG.Module.UI{
             // 		yield return new WaitForFixedUpdate ();
             // 	}
             // }
-
             if (_gameViewState == GameViewState.HIDE){
                 LogHelper.Log($"GameView状态:{_gameViewState}");
             }
@@ -226,23 +225,24 @@ namespace IG.Module.UI{
             }
         }
 
-        private void Awake(){
+        protected override void OnAwake(){
             if (!Application.isPlaying){
                 return;
             }
 
             _firstInitializeFlg = true;
             //		childViewStack = new Stack<GameView> ();
-            OnAwake();
+            this.gameObject.SetActive(false);
         }
 
-        protected virtual void OnAwake(){ this.gameObject.SetActive(false); }
         private           void Start()  { this.OnStart(); }
         protected virtual void OnStart(){ }
 
-        private void Update(){
-            if (!_isShowComplete) return;
+        [IGBCEvent(LoopEventType.Update)]
+        protected bool Tick(float deltaTime){
+            if (!_isShowComplete) return false;
             OnUpdate();
+            return true;
         }
 
         protected virtual void OnUpdate(){ }
