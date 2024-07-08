@@ -37,12 +37,12 @@ namespace IG.Module.UI{
         /// <summary>
         /// The item prefab
         /// </summary>
-        public string ItemPrefabPath = null;
+        public GameObject ItemPrefab = null;
 
         /// <summary>
         /// The point path.
         /// </summary>
-        public string PointPath;
+        public GameObject PointPrefab;
 
         /// <summary>
         /// The animation time.
@@ -125,7 +125,7 @@ namespace IG.Module.UI{
                 return;
             }
 
-            if (string.IsNullOrEmpty(ItemPrefabPath)){
+            if (null == ItemPrefab){
                 Debug.LogError("GameScrollRect' ItemPrefabPath is null.");
                 return;
             }
@@ -145,20 +145,15 @@ namespace IG.Module.UI{
                     continue;
                 }
 
-                AssetSystem.LoadAsync(
-                                      (o, oArg) => {
-                                          GameScrollItem item = (o as GameObject).GetComponent<GameScrollItem>();
-                                          item.transform.SetParent(this.Content);
-                                          item.gameObject.SetActive(false);
-                                          this.Add(item);
-                                          //				this.ResetPos ();
-                                          if (_currentShowList.Count == count){
-                                              this.RefreshData();
-                                          }
-                                      },
-                                      ItemPrefabPath,
-                                      typeof(GameObject)
-                                     );
+                var            obj  = GameObject.Instantiate(ItemPrefab);
+                GameScrollItem item = obj.GetComponent<GameScrollItem>();
+                item.transform.SetParent(this.Content);
+                item.gameObject.SetActive(false);
+                this.Add(item);
+                //				this.ResetPos ();
+                if (_currentShowList.Count == count){
+                    this.RefreshData();
+                }
             }
 
             if (this.Points.childCount >= _dataList.Count){
@@ -168,26 +163,21 @@ namespace IG.Module.UI{
 
             if (_isDrag){
                 for (int i = 0; i < _dataList.Count; i++){
-                    if (!string.IsNullOrEmpty(this.PointPath)){
+                    if (null != this.PointPrefab){
                         StartCoroutine(ResetPointsPos(true));
-                        AssetSystem.LoadAsync(
-                                              (o, oArg) => {
-                                                  ScrollViewPoint item = (o as GameObject).GetComponent<ScrollViewPoint>();
-                                                  item.transform.SetParent(this.Points);
-                                                  if (this.Points.childCount > _dataList.Count){
-                                                      Destroy(item.gameObject);
-                                                      return;
-                                                  }
+                        var             obj  = GameObject.Instantiate(PointPrefab);
+                        ScrollViewPoint item = obj.GetComponent<ScrollViewPoint>();
+                        item.transform.SetParent(this.Points);
+                        if (this.Points.childCount > _dataList.Count){
+                            Destroy(item.gameObject);
+                            return;
+                        }
 
-                                                  if (this.Points.childCount == _dataList.Count){
-                                                      StartCoroutine(ResetPointsPos(false));
-                                                  }
+                        if (this.Points.childCount == _dataList.Count){
+                            StartCoroutine(ResetPointsPos(false));
+                        }
 
-                                                  RestPoints();
-                                              },
-                                              PointPath,
-                                              typeof(GameObject)
-                                             );
+                        RestPoints();
                     }
                 }
             }
