@@ -1,13 +1,20 @@
 using System;
 using System.Collections.Generic;
-using IG.AssetBundle;
-using IG.Runtime.Log;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace IG.Module.UI{
     public class GameScrollView : ScrollRect{
+        /// <summary>
+        /// Using dynamic width
+        /// </summary>
+        public bool DynamicWidth;
+
+        /// <summary>
+        /// Using dynamic height
+        /// </summary>
+        public bool DynamicHeight;
+        
         /// <summary>
         /// Display column count
         /// </summary>
@@ -36,7 +43,10 @@ namespace IG.Module.UI{
         /// </summary>
         public Vector2 Spacing = Vector2.zero;
 
-        public string ItemPrefabPath;
+        /// <summary>
+        /// The item prefab
+        /// </summary>
+        public GameObject ItemPrefab = null;
 
         /// <summary>
         /// All item collections
@@ -95,7 +105,7 @@ namespace IG.Module.UI{
         /// Override initial slide
         /// </summary>
         /// <param name="eventData">Event data.</param>
-        public override void OnInitializePotentialDrag(PointerEventData eventData){
+        public override void OnInitializePotentialDrag(UnityEngine.EventSystems.PointerEventData eventData){
             base.OnInitializePotentialDrag(eventData);
             _isInit = true;
         }
@@ -116,12 +126,12 @@ namespace IG.Module.UI{
         /// <summary>
         /// Set the data source
         /// </summary>
-        /// <param name="datas">Datas.</param>
+        /// <param name="data">Datas.</param>
         /// <typeparam name="T">IGameScrollItemData.</typeparam>
-        public void SetDatas<T>(List<T> datas, Action callBack = null) where T : IGameScrollItemData{
+        public void SetData<T>(List<T> data, Action callBack = null) where T : IGameScrollItemData{
             _DataList.Clear();
-            for (int i = 0; i < datas.Count; i++){
-                _DataList.Add(datas[i]);
+            for (int i = 0; i < data.Count; i++){
+                _DataList.Add(data[i]);
             }
 
             _initCmpCallBack = callBack;
@@ -135,12 +145,20 @@ namespace IG.Module.UI{
         /// </summary>
         /// <param name="datas">Datas.</param>
         /// <typeparam name="T">IGameScrollItemData.</typeparam>
-        public void AddDatas<T>(List<T> datas) where T : IGameScrollItemData{
+        public void AddData<T>(List<T> datas,bool refresh) where T : IGameScrollItemData{
             for (int i = 0; i < datas.Count; i++){
                 _DataList.Add(datas[i]);
             }
 
             ResetSizeDelta();
+            if (refresh){
+                if (_DataList.Count <= _currentShowList.Count){
+                    this.RefreshShowList();
+                }
+                else{
+                    InitItemPrefab();
+                }
+            }
         }
 
         /// <summary>
@@ -148,9 +166,17 @@ namespace IG.Module.UI{
         /// </summary>
         /// <param name="data">data.</param>
         /// <typeparam name="T">IGameScrollItemData.</typeparam>
-        public void AddDatas<T>(T data) where T : IGameScrollItemData{
+        public void AddData<T>(T data, bool refresh) where T : IGameScrollItemData{
             _DataList.Add(data);
             ResetSizeDelta();
+            if (refresh){
+                if (_DataList.Count <= _currentShowList.Count){
+                    this.RefreshShowList();
+                }
+                else{
+                    InitItemPrefab();
+                }
+            }
         }
 
         private void InitItemPrefab(){
@@ -163,8 +189,8 @@ namespace IG.Module.UI{
                 return;
             }
 
-            if (string.IsNullOrEmpty(ItemPrefabPath)){
-                this.Log("GameScrollRect' itemPrefabPath is null.", LogType.Error);
+            if (ItemPrefab == null){
+                Debug.LogError("GameScrollRect' ItemPrefab is null.");
                 return;
             }
 
@@ -193,35 +219,26 @@ namespace IG.Module.UI{
                     continue;
                 }
 
-                //            GameScrollItem newItem = GameAssetManager.InstantiatePrefab<GameScrollItem>(itemPrefabPath, this.content);
-                //            newItem.gameObject.SetActive(false);
-                //            this.Add(newItem);
-                //            this.isForce = true;
-                AssetSystem.LoadAsync(
-                                      (o, oArg) => {
-                                          GameObject     itemObj = GameObject.Instantiate((o as GameObject));
-                                          GameScrollItem item    = itemObj.GetComponent<GameScrollItem>();
-                                          item.transform.SetParent(this.content);
-                                          item.gameObject.SetActive(false);
-                                          this.Add(item);
-                                          this._isForce = true;
-                                          num++;
-                                          if (num >= count){
-                                              this.RefreshShowList(true);
-                                              if (_initCmpCallBack != null){
-                                                  _initCmpCallBack.Invoke();
-                                              }
-                                          }
-                                      },
-                                      ItemPrefabPath,
-                                      typeof(GameObject)
-                                     );
+                //有问题，Refresh里边没有涉及InitPrefab内容
+                // UnityEngine.GameObject it   = AssetSystem.LoadByMedian(PathConfig.BundleRelated.UI_BUNDLE, ItemPrefabPath, ItemMediaPath, typeof(GameObject)) as GameObject;
+                GameObject     ga   = GameObject.Instantiate(ItemPrefab,this.content);
+                GameScrollItem item = ga.GetComponent<GameScrollItem>();
+                item.gameObject.SetActive(false);
+                this.Add(item);
+                this._isForce = true;
+                num++;
+                if (num >= count){
+                    this.RefreshShowList(true);
+                    if (_initCmpCallBack != null){
+                        _initCmpCallBack.Invoke();
+                    }
+                }
             }
         }
 
         private void Add(GameScrollItem gameScrollRectItem){
             if (_currentShowList.Count >= this.RowCount * this.ColumnCount || _DataList.Count <= _currentShowList.Count){
-                Destroy(gameScrollRectItem.gameObject);
+                GameObject.Destroy(gameScrollRectItem.gameObject);
                 return;
             }
 
@@ -242,7 +259,7 @@ namespace IG.Module.UI{
             }
 
             if (this.content == null){
-                Destroy(rectTransform.gameObject);
+                GameObject.Destroy(rectTransform.gameObject);
                 return false;
             }
 
@@ -263,7 +280,7 @@ namespace IG.Module.UI{
             //Horizontal and vertical
             if (this.horizontal && this.vertical){
                 int wh = Mathf.CeilToInt(Mathf.Pow(_DataList.Count, 0.5f));
-                this.content.sizeDelta = new Vector2(_ItemSize.x * wh, _ItemSize.y * wh + Top + Bottom);
+                this.content.sizeDelta = new Vector2(itemSize.x * wh, itemSize.y * wh + Top + Bottom);
             }
             else if (this.horizontal){
                 //Horizontal
@@ -273,7 +290,7 @@ namespace IG.Module.UI{
                 }
 
                 int totalRowCount = RowCount; //dataList.Count < rowCount ? dataList.Count : rowCount;
-                this.content.sizeDelta = new Vector2(_ItemSize.x * totalColumnCount, _ItemSize.y * totalRowCount + Top + Bottom);
+                this.content.sizeDelta = new Vector2(itemSize.x * totalColumnCount, itemSize.y * totalRowCount + Top + Bottom);
             }
             else if (this.vertical){
                 // vertical
@@ -283,7 +300,7 @@ namespace IG.Module.UI{
                 }
 
                 int totalColumnCount = ColumnCount; //dataList.Count < columnCount ? dataList.Count : columnCount;
-                this.content.sizeDelta = new Vector2(_ItemSize.x * totalColumnCount, _ItemSize.y * totalRowCount + Top + Bottom);
+                this.content.sizeDelta = new Vector2(itemSize.x * totalColumnCount, itemSize.y * totalRowCount + Top + Bottom);
             }
         }
 
@@ -293,7 +310,7 @@ namespace IG.Module.UI{
         private void OnValueChanged(){
             int beginIndexTemp = GetMinIndex();
             if (!_isForce){
-                if ((beginIndexTemp == _beginIndex && _currentShowList.Count >= _PageSize) || beginIndexTemp < 0){
+                if ((beginIndexTemp == _beginIndex && _currentShowList.Count >= pageSize) || beginIndexTemp < 0){
                     return;
                 }
             }
@@ -323,14 +340,22 @@ namespace IG.Module.UI{
                 }
             }
 
-            int count = Mathf.Clamp(_currentShowList.Count, 0, _PageSize);
+            int count = Mathf.Clamp(_currentShowList.Count, 0, pageSize);
             //Display objects that appear within the display range
+            Vector2 prePos = Vector2.zero;
             for (int i = _beginIndex; i < _DataList.Count && i < _beginIndex + count; i++){
                 int index = i % count;
                 _currentShowList[index].gameObject.SetActive(true);
                 _currentShowList[index].transform.SetParent(this.content);
                 _currentShowList[index].SetData(_DataList[i]);
-                SetItemPostion(i, _currentShowList[index].transform as RectTransform);
+                // SetItemPosition(i, _currentShowList[index].transform as RectTransform);
+                // 新方式,考虑动态item 宽高
+                if (DynamicHeight || DynamicWidth){
+                    prePos = SetItemPosition(i,_currentShowList[index],prePos);
+                }
+                else{
+                    SetItemPosition(i, _currentShowList[index].transform as RectTransform);
+                }
             }
         }
 
@@ -357,24 +382,69 @@ namespace IG.Module.UI{
         /// </summary>
         /// <param name="index">Index.</param>
         /// <param name="rectTransform">Rect transform.</param>
-        protected virtual void SetItemPostion(int index, RectTransform rectTransform){
+        protected virtual void SetItemPosition(int index, RectTransform rectTransform){
             int x = 0;
             int y = 0;
             if (this.horizontal){
-                x = index  / RowCount;
+                x = index / RowCount;
                 y = -index % RowCount;
             }
 
             if (this.vertical){
                 y = -index / ColumnCount;
-                x = index  % ColumnCount;
+                x = index % ColumnCount;
             }
 
             rectTransform.localPosition = Vector3.zero;
             rectTransform.localScale    = Vector3.one;
             //        rectTransform.anchoredPosition = new Vector2(x * itemSize.x + spacing.x, y * itemSize.y - spacing.y);
-            Vector2 newPos = new Vector2(x * _ItemSize.x + Left, y * _ItemSize.y - Top);
+            Vector2 newPos = new Vector2(x * itemSize.x + Left, y * itemSize.y - Top);
             rectTransform.anchoredPosition = newPos;
+        }
+        
+        /// <summary>
+        /// Set item coordinates
+        /// </summary>
+        /// <param name="index">Index.</param>
+        /// <param name="srItem">Rect transform.</param>
+        protected virtual Vector2 SetItemPosition(int index, GameScrollItem srItem, Vector2 prePos){
+            Vector2 newPos = Vector2.zero;
+            int     x      = 0;
+            int     y      = 0;
+            if (this.horizontal){
+                x = index / RowCount;
+                y = -index % RowCount;
+            }
+
+            if (this.vertical){
+                y = -index / ColumnCount;
+                x = index % ColumnCount;
+            }
+
+            float width  = x * itemSize.x + Left;
+            float height = y * itemSize.y - Top;
+            if (DynamicWidth){
+                width = prePos.x;
+            }
+
+            if (DynamicHeight){
+                height = prePos.y;
+            }
+
+            srItem.UIRect().localPosition    = Vector3.zero;
+            srItem.UIRect().localScale       = Vector3.one;
+            newPos                           = new Vector2(width,height );
+            srItem.UIRect().anchoredPosition = newPos;
+            
+            if (DynamicWidth){
+                newPos.x += srItem.GetWidth() + Spacing.x + Left;
+            }
+
+            if (DynamicHeight){
+                newPos.y += -srItem.GetHeight() - Spacing.y - Top; 
+            }
+            
+            return newPos;
         }
 
         /// <summary>
@@ -389,9 +459,9 @@ namespace IG.Module.UI{
                 }
 
                 float x = Mathf.Abs(this.content.anchoredPosition.x);
-                index = Mathf.FloorToInt(x / (_ItemSize.x * this.content.localScale.x)) * RowCount;
-                if (index + _PageSize > _DataList.Count){
-                    index = _DataList.Count - _PageSize;
+                index = Mathf.FloorToInt(x / (itemSize.x * this.content.localScale.x)) * RowCount;
+                if (index + pageSize > _DataList.Count){
+                    index = _DataList.Count - pageSize;
                 }
             }
 
@@ -401,9 +471,9 @@ namespace IG.Module.UI{
                 }
 
                 float y = Mathf.Abs(this.content.anchoredPosition.y);
-                index = Mathf.FloorToInt(y / (_ItemSize.y * this.content.localScale.y)) * ColumnCount;
-                if (index + _PageSize > _DataList.Count){
-                    index = _DataList.Count - _PageSize;
+                index = Mathf.FloorToInt(y / (itemSize.y * this.content.localScale.y)) * ColumnCount;
+                if (index + pageSize > _DataList.Count){
+                    index = _DataList.Count - pageSize;
                 }
             }
 
@@ -418,12 +488,12 @@ namespace IG.Module.UI{
         /// Current display area item number
         /// </summary>
         /// <value>The size of the get page.</value>
-        protected int _PageSize{ get{ return ColumnCount * RowCount; } }
+        protected int pageSize{ get{ return ColumnCount * RowCount; } }
 
-        protected Vector2 _ItemSize{ get{ return CellSize + Spacing; } }
+        protected Vector2 itemSize{ get{ return CellSize + Spacing; } }
 
         private void IEShowInit(){
-            if (this.content.childCount <= this._PageSize){
+            if (this.content.childCount <= this.pageSize){
                 OnValueChanged();
             }
 
@@ -463,7 +533,7 @@ namespace IG.Module.UI{
                 _currentShowList.RemoveAt(0);
                 item.SetActive(false);
                 if (isDestroy){
-                    Destroy(item);
+                    GameObject.Destroy(item);
                 }
             }
 

@@ -1,6 +1,6 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System;
 
 namespace IG.Module.UI{
     public class ScrollViewPoint : MonoBehaviour, IPointerClickHandler{
@@ -9,7 +9,7 @@ namespace IG.Module.UI{
         private Action<int> _onClick;
         private int         _index;
 
-        public void init(int index, Action<int> onClick){
+        public void Init(int index, Action<int> onClick){
             this._onClick = onClick;
             this._index   = index;
         }

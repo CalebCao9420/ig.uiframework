@@ -4,7 +4,7 @@ namespace IG.Module.UI{
     /// <summary>
     /// Scrolling list item base class
     /// </summary>
-    public class GameScrollItem : EventMonoBehaviour{
+    public abstract class GameScrollItem : EventMonoBehaviour{
         protected object _Obj;
 
         public void SetData(IGameScrollItemData data){
@@ -13,7 +13,9 @@ namespace IG.Module.UI{
             SetData(isRepeatRefresh);
         }
 
-        protected virtual void SetData(bool isRepeatRefresh){ }
+        protected virtual void  SetData(bool isRepeatRefresh){ }
+        public abstract   float GetWidth();
+        public abstract   float GetHeight();
     }
 
     /// <summary>

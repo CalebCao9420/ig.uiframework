@@ -23,9 +23,11 @@ namespace IG.Module.UI{
             this.Icon.sprite  = _icons.Find(f => f.m_type  == this.Data.m_IconType).m_Sprite;
         }
 
-        public void OnPointerClick(PointerEventData eventData){ }
-        public void OnPointerDown(PointerEventData  eventData){ }
-        public void OnPointerUp(PointerEventData    eventData){ }
+        public override float GetWidth()                                { return Icon.mainTexture.width; }
+        public override float GetHeight()                               { return Icon.mainTexture.height; }
+        public          void  OnPointerClick(PointerEventData eventData){ }
+        public          void  OnPointerDown(PointerEventData  eventData){ }
+        public          void  OnPointerUp(PointerEventData    eventData){ }
     }
 
     [Serializable]

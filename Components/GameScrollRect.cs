@@ -8,7 +8,7 @@ namespace IG.Module.UI{
         public GameScrollRectSetting Setting{ get => null; set => SetSettings(value); }
 
         public void SetSettings(GameScrollRectSetting settings){
-            this.ItemPrefabPath = settings.ItemPrefabPath;
+            this.ItemPrefab = settings.ItemPrefab;
             this.CellSize       = settings.CellSize;
             this.Spacing        = settings.Spacing;
             this.RowCount       = settings.Row;
@@ -22,7 +22,7 @@ namespace IG.Module.UI{
 
     [Serializable]
     public class GameScrollRectSetting{
-        public string ItemPrefabPath;
+        public GameObject ItemPrefab;
 
         [Header("Cell Seetings")]
         public Vector2 CellSize;

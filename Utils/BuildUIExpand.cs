@@ -422,7 +422,7 @@ namespace IG.Module.UI{
         }
 
         public static bool Build<T>(this List<T> value, GameScrollView gameScrollView) where T : IGameScrollItemData{
-            gameScrollView.SetDatas<T>(value);
+            gameScrollView.SetData<T>(value);
             return true;
         }
 
