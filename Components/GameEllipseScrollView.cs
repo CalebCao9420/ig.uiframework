@@ -1,4 +1,3 @@
-using IG.Module.UI.Editor;
 using UnityEngine;
 
 namespace IG.Module.UI{
