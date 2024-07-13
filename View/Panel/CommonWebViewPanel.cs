@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace IG.Module.UI{
     public class CommonWebViewPanel : DialogPanel{
-        protected override void AddEvent() { base.AddEvent(); }
-        protected override void OnDestroy(){ base.OnDestroy(); }
-
         protected override void InitData(){
             base.InitData();
             string url        = WebViewController.Instance.CommonUrl;
