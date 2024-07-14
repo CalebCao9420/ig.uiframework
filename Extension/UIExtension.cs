@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using IG.AssetBundle;
 using IG.Runtime.Extensions;
 using TMPro;
@@ -8,13 +7,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace IG.Module.UI{
-    public static class ExtendedUI{
+    public static class UIExtension{
+    #region Using asset system
+
         public static void SetSp(this Image img, string path){
             var sprite = AssetSystem.Load<Sprite>(path);
             img.sprite = sprite;
         }
 
-        public static void SetSpAsyn(this Image img, string path, Action ok = null){
+        public static void SetSpAsync(this Image img, string path, Action ok = null){
             AssetSystem.LoadAsync(
                                   (p, pArg) => {
                                       img.sprite = p as Sprite;
@@ -26,7 +27,7 @@ namespace IG.Module.UI{
                                  );
         }
 
-        public static void SetRawImgAsyn(this RawImage img, string path, Action<RawImage> ok = null){
+        public static void SetRawImgAsync(this RawImage img, string path, Action<RawImage> ok = null){
             AssetSystem.LoadAsync(
                                   (p, pArg) => {
                                       if (ok != null){
@@ -44,10 +45,116 @@ namespace IG.Module.UI{
             img.texture = loadImg;
         }
 
-        public static List<T> Clone<T>(this List<T> ori){
-            if (ori == null) return null;
-            return new List<T>(ori.ToArray());
+    #endregion
+
+    #region UI Components
+    #region UIImageClip
+
+        public static void SetActive(this UIImageClip clip, bool value){ clip.gameObject.SetActive(value); }
+
+    #endregion
+
+    #region Button
+
+        public static void SetActive(this Button button, bool value){ button.gameObject.SetActive(value); }
+        public static void Show(this      Button button){ button.gameObject.SetActive(true); }
+        public static void Hide(this      Button button){ button.gameObject.SetActive(false); }
+
+        public static void AddClick(this Button button, Action click){
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(
+                                       () => {
+                                           if (null != click){
+                                               click();
+                                           }
+                                       }
+                                      );
         }
+
+        public static void RemoveClick(this Button button){ button.onClick.RemoveAllListeners(); }
+
+        /// <summary>
+        /// 设置按钮文字
+        /// TEXT组件必须为Button组件的子组件,不支持多个
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="value"></param>
+        public static void SetButtonLabel(this Button button, string value){
+            Text label = button.GetComponentInChildren<Text>();
+            if (null != label){
+                label.text = value;
+            }
+        }
+
+    #endregion
+
+    #region Image
+
+        public static void SetActive(this Image img, bool value){ img.gameObject.SetActive(value); }
+        public static void Show(this      Image img){ img.gameObject.SetActive(true); }
+        public static void Hide(this      Image img){ img.gameObject.SetActive(false); }
+
+        public static void SetTexture(this Image img, Texture2D texture){
+            if (null != texture){
+                img.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            }
+        }
+
+        //000000A9
+        public static Color32 IMAGE_DISABLED = new Color32(120, 120, 120, 255);
+
+        public static void Disabled(this Image img, bool value){
+            if (value){
+                img.color = IMAGE_DISABLED;
+            }
+            else{
+                img.color = Color.white;
+            }
+        }
+
+    #endregion
+
+    #region Text
+
+        public static           void SetActive(this               Text txt, bool value){ txt.gameObject.SetActive(value); }
+        public static           void Show(this                    Text txt)                { txt.gameObject.SetActive(true); }
+        public static           void Hide(this                    Text txt)                { txt.gameObject.SetActive(false); }
+        public static           void SetTextPercent(this          Text label, float value) { label.text = value.ToString("P1"); }
+        public static           void SetCurrencyLocalization(this Text label, int   amount){ label.text = amount.ToString("N0"); }
+        private static readonly int  s_NUMBER_M = 1000000;
+
+        public static void SetNumber(this Text label, int value, bool setAmountX = false){
+            string txt = "";
+            if (value < s_NUMBER_M){
+                txt        = value.ToString();
+                label.text = value.ToString();
+            }
+            else{
+                int m      = value / s_NUMBER_M;
+                int remain = value % s_NUMBER_M;
+                int suffix = 0;
+                if (remain > 0){
+                    double v = Math.Round((double)remain / (double)s_NUMBER_M, 1);
+                    suffix = (int)(v * 10);
+                    if (suffix >= 10){
+                        suffix--;
+                    }
+                }
+
+                txt = $"{m}.{suffix}M";
+            }
+
+            if (setAmountX){
+                label.text = $"x{txt}";
+            }
+            else{
+                label.text = txt;
+            }
+        }
+
+    #endregion    
+
+    #endregion
 
         public static void          SetActive(this Component     behaviour, bool value){ behaviour.gameObject.SetActive(value); }
         public static RectTransform UIRect(this    Transform     transform){ return transform as RectTransform; }
@@ -134,14 +241,21 @@ namespace IG.Module.UI{
 
         public static void ChildInteractable(this GameObject self, bool val, Color disabledColor){
             // Button
-            Button[] btns    = self.GetComponentsInChildren<Button>();
-            Image[]  btnsImg = btns.Select(s => s.image).ToArray();
-            for (int i = 0; i < btns.Length; i++){
+            List<Button> btns     = new();
+            self.GetComponentsInChildren<Button>(btns);
+            List<Image> btnsImg = new();
+            int         btnCount   = btns?.Count ?? 0;
+            for (int i = 0; i < btnCount; ++i){
                 var TMBtn = btns[i].GetComponent<GameButtonTextMeshPro>();
-                if (TMBtn != null)
+                if (TMBtn != null){
                     TMBtn.interactable = val;
-                else
+                }
+                else{
                     btns[i].interactable = val;
+                }
+
+                Image img = btns[i].image;
+                btnsImg.Add(img);
             }
 
             // Imgs

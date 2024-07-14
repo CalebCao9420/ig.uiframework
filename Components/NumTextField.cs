@@ -64,7 +64,7 @@ namespace IG.Module.UI{
                 newNumImg.transform.SetParent(Cont);
                 newNumImg.transform.localPosition = Vector3.zero;
                 newNumImg.transform.localScale    = Vector3.one;
-                newNumImg.SetSpAsyn(numPath);
+                newNumImg.SetSpAsync(numPath);
                 _imgList.Add(newNumImg);
             }
         }
