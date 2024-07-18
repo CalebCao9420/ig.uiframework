@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace IG.Module.UI{
     public class SmallPopup : PopupPanel{
@@ -6,7 +7,7 @@ namespace IG.Module.UI{
 
         protected override void InitData(){
             base.InitData();
-            this.AddClickListener("OKButton", this.Close);
+            this.transform.Find<Button>("OKButton").AddClick(this.Close);
         }
 
         protected override void ShowData(){

@@ -17,7 +17,7 @@ namespace IG.Module.UI{
             base.OnAwake();
             this._IsIgnoreLoading = true;
             _popupViewAnimation   = this.GetOrAddComponent<PopupViewAnimation>();
-            OkButton.AddClickListener(this.OnOKButton);
+            OkButton.AddClick(this.OnOKButton);
         }
 
         protected override void ShowData(){

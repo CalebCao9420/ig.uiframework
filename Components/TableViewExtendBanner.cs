@@ -56,26 +56,26 @@ namespace IG.Module.UI{
 			if (!_tableView.Loop) {
 				if (_tableView.StartCellDataIndex >= (_tableView.Data.Length - 1)) {
 					if (_next != null) {
-						_next.SetInteractable(false, Color.white, Color.gray);
+						_next.SetInteractable(false);
 						//next.interactable = false;
 						_next.gameObject.SetActive(_tableView.Data.Length>1);
 					}
 				} else {
 					if (_next != null) {
-						_next.SetInteractable(true, Color.white, Color.gray);
+						_next.SetInteractable(true);
 						_next.gameObject.SetActive(_tableView.Data.Length>1);
 						//next.interactable = true;
 					}
 				}
 				if (_tableView.StartCellDataIndex <= 0) {
 					if (_prev != null) {
-						_prev.SetInteractable(false,new Color(52f/255f,34f/255f,27f/255f,1f), Color.gray);
+						_prev.SetInteractable(false);
 						_prev.gameObject.SetActive(_tableView.Data.Length>1);
 						//prev.interactable = false;
 					}
 				} else {
 					if (_prev != null) {
-						_prev.SetInteractable(true, new Color(52f/255f,34f/255f,27f/255f,1f), Color.gray);
+						_prev.SetInteractable(true);
 						_prev.gameObject.SetActive(_tableView.Data.Length>1);
 						//prev.interactable = true;
 					}
