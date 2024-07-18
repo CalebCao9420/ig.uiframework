@@ -52,23 +52,17 @@ namespace IG.Module.UI{
 
     #region RectTransform
 
-        public static void SizeHeight(this RectTransform rect, float height, float dur = .0f){
+        public static void SizeHeight(this RectTransform rect, float height){
             Vector2 size = new Vector2(rect.sizeDelta.x, height);
-            SizeDelta(rect, size, dur);
+            SetSize(rect, size);
         }
 
-        public static void SizeWidth(this RectTransform rect, float width, float dur = .0f){
+        public static void SizeWidth(this RectTransform rect, float width){
             Vector2 size = new Vector2(width, rect.sizeDelta.y);
-            SizeDelta(rect, size, dur);
+            SetSize(rect, size);
         }
-
-        public static void SizeDelta(this RectTransform rect, Vector2 size, float dur = .0f){
-            if (dur > 0){
-                rect.DOSizeDelta(size, dur);
-            }
-            else{
-                rect.sizeDelta = size;
-            }
+        public static void SetSize(this RectTransform rect, Vector2 size){
+            rect.sizeDelta = size;
         }
 
         public static void Scale(this RectTransform rect, float value, float dur = 0.0f){
@@ -128,26 +122,38 @@ namespace IG.Module.UI{
         public static void Show(this      Image img){ img.gameObject.SetActive(true); }
         public static void Hide(this      Image img){ img.gameObject.SetActive(false); }
 
-        public static void Alpha(this MaskableGraphic graphic, float value, float dur = 0.0f){
-            if (dur > 0){
-                graphic.DOFade(value, dur);
-            }
-            else{
-                Color color = graphic.color;
-                color.a       = value;
-                graphic.color = color;
-            }
+        // public static void Alpha(this MaskableGraphic graphic, float value, float dur = 0.0f){
+        //     if (dur > 0){
+        //         graphic.DOFade(value, dur);
+        //     }
+        //     else{
+        //         Color color = graphic.color;
+        //         color.a       = value;
+        //         graphic.color = color;
+        //     }
+        // }
+        //
+        // public static void Alpha(this Image img, float value, float dur = 0.0f){
+        //     if (dur > 0){
+        //         img.DOFade(value, dur);
+        //     }
+        //     else{
+        //         Color color = img.color;
+        //         color.a   = value;
+        //         img.color = color;
+        //     }
+        // }
+        
+        public static void Alpha(this MaskableGraphic graphic, float value){
+            Color color = graphic.color;
+            color.a       = value;
+            graphic.color = color;
         }
 
         public static void Alpha(this Image img, float value, float dur = 0.0f){
-            if (dur > 0){
-                img.DOFade(value, dur);
-            }
-            else{
-                Color color = img.color;
-                color.a   = value;
-                img.color = color;
-            }
+            Color color = img.color;
+            color.a   = value;
+            img.color = color;
         }
 
         public static void SetTexture(this Image img, Texture2D texture){
