@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using IG.AssetBundle;
 using IG.Runtime.Extensions;
 using TMPro;
@@ -48,6 +49,39 @@ namespace IG.Module.UI{
     #endregion
 
     #region UI Components
+
+    #region RectTransform
+
+        public static void SizeHeight(this RectTransform rect, float height, float dur = .0f){
+            Vector2 size = new Vector2(rect.sizeDelta.x, height);
+            SizeDelta(rect, size, dur);
+        }
+
+        public static void SizeWidth(this RectTransform rect, float width, float dur = .0f){
+            Vector2 size = new Vector2(width, rect.sizeDelta.y);
+            SizeDelta(rect, size, dur);
+        }
+
+        public static void SizeDelta(this RectTransform rect, Vector2 size, float dur = .0f){
+            if (dur > 0){
+                rect.DOSizeDelta(size, dur);
+            }
+            else{
+                rect.sizeDelta = size;
+            }
+        }
+
+        public static void Scale(this RectTransform rect, float value, float dur = 0.0f){
+            if (dur > 0){
+                rect.DOScale(value, dur);
+            }
+            else{
+                rect.localScale = new Vector3(value, value, 1);
+            }
+        }
+
+    #endregion
+
     #region UIImageClip
 
         public static void SetActive(this UIImageClip clip, bool value){ clip.gameObject.SetActive(value); }
@@ -93,6 +127,28 @@ namespace IG.Module.UI{
         public static void SetActive(this Image img, bool value){ img.gameObject.SetActive(value); }
         public static void Show(this      Image img){ img.gameObject.SetActive(true); }
         public static void Hide(this      Image img){ img.gameObject.SetActive(false); }
+
+        public static void Alpha(this MaskableGraphic graphic, float value, float dur = 0.0f){
+            if (dur > 0){
+                graphic.DOFade(value, dur);
+            }
+            else{
+                Color color = graphic.color;
+                color.a       = value;
+                graphic.color = color;
+            }
+        }
+
+        public static void Alpha(this Image img, float value, float dur = 0.0f){
+            if (dur > 0){
+                img.DOFade(value, dur);
+            }
+            else{
+                Color color = img.color;
+                color.a   = value;
+                img.color = color;
+            }
+        }
 
         public static void SetTexture(this Image img, Texture2D texture){
             if (null != texture){
@@ -152,9 +208,11 @@ namespace IG.Module.UI{
             }
         }
 
-    #endregion    
+    #endregion
 
     #endregion
+
+    #region Misc
 
         public static void          SetActive(this Component     behaviour, bool value){ behaviour.gameObject.SetActive(value); }
         public static RectTransform UIRect(this    Transform     transform){ return transform as RectTransform; }
@@ -241,10 +299,10 @@ namespace IG.Module.UI{
 
         public static void ChildInteractable(this GameObject self, bool val, Color disabledColor){
             // Button
-            List<Button> btns     = new();
+            List<Button> btns = new();
             self.GetComponentsInChildren<Button>(btns);
-            List<Image> btnsImg = new();
-            int         btnCount   = btns?.Count ?? 0;
+            List<Image> btnsImg  = new();
+            int         btnCount = btns?.Count ?? 0;
             for (int i = 0; i < btnCount; ++i){
                 var TMBtn = btns[i].GetComponent<GameButtonTextMeshPro>();
                 if (TMBtn != null){
@@ -328,6 +386,10 @@ namespace IG.Module.UI{
             }
         }
 
+    #endregion
+
+    #region ToString
+
         public static string ToTString(this int value){
             string str = value.ToString();
             if (value > 0){
@@ -341,6 +403,8 @@ namespace IG.Module.UI{
             string str = value.Replace("\\n", "\n");
             return str;
         }
+
+    #endregion
     }
 
     public static class ExtendedUIAssist{
