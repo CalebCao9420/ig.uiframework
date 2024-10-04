@@ -70,7 +70,7 @@ namespace IG.Module.UI{
             PopupCommonData.Title = _PopData.PopupItemData.Title;
             Transform  popupItemTransform = this.Find("PopupItem");
             PrefabInfo prefabInfo         = GamePrefabPaths.GetPath(_PopData.PopupItemData.PopupItemView);
-            AssetSystem.LoadAsync(
+            AssetsSystem.LoadAsync(
                                   (o, oArg) => {
                                       var        prefab = o as GameObject;
                                       GameObject obj    = Instantiate(prefab);

@@ -274,7 +274,7 @@ namespace IG.Module.UI{
             //                                                 );
             PrefabInfo prefabInfo = GamePrefabPaths.GetPath(panelParam.PType);
             if (panelParam.IsAsync){
-                AssetSystem.LoadAsync(
+                AssetsSystem.LoadAsync(
                                       (o, o1) => {
                                           GameObject obj = Instantiate(o as GameObject);
                                           obj.name = (o as GameObject).name;
@@ -286,7 +286,7 @@ namespace IG.Module.UI{
                                      );
             }
             else{
-                GameObject prefab = AssetSystem.Load<GameObject>(prefabInfo.path);
+                GameObject prefab = AssetsSystem.Load<GameObject>(prefabInfo.path);
                 GameObject obj    = Instantiate(prefab);
                 obj.name = prefab.name;
                 GamePanel gamePanel = obj.GetComponent<GamePanel>();

@@ -12,12 +12,12 @@ namespace IG.Module.UI{
     #region Using asset system
 
         public static void SetSp(this Image img, string path){
-            var sprite = AssetSystem.Load<Sprite>(path);
+            var sprite = AssetsSystem.Load<Sprite>(path);
             img.sprite = sprite;
         }
 
         public static void SetSpAsync(this Image img, string path, Action ok = null){
-            AssetSystem.LoadAsync(
+            AssetsSystem.LoadAsync(
                                   (p, pArg) => {
                                       img.sprite = p as Sprite;
                                       if (ok != null){
@@ -29,7 +29,7 @@ namespace IG.Module.UI{
         }
 
         public static void SetRawImgAsync(this RawImage img, string path, Action<RawImage> ok = null){
-            AssetSystem.LoadAsync(
+            AssetsSystem.LoadAsync(
                                   (p, pArg) => {
                                       if (ok != null){
                                           var tex = p as Texture;
@@ -42,7 +42,7 @@ namespace IG.Module.UI{
         }
 
         public static void SetRawImg(this RawImage img, string path){
-            var loadImg = AssetSystem.Load<Texture>(path);
+            var loadImg = AssetsSystem.Load<Texture>(path);
             img.texture = loadImg;
         }
 

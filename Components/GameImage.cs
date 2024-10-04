@@ -8,18 +8,18 @@ namespace IG.Module.UI{
         public void SetFillAmount(float min, float max){ this.fillAmount = min / max; }
 
         public void AsyncLoadImage(string path, Action<Image> action = null, bool isForceLocal = false){
-            AssetSystem.LoadAsync(
-                                  (o, oArg) => {
-                                      var sprite = o as Sprite;
-                                      this.sprite = sprite;
-                                      action?.Invoke(this);
-                                  },
-                                  path
-                                 );
+            AssetsSystem.LoadAsync(
+                                   (o, oArg) => {
+                                       var sprite = o as Sprite;
+                                       this.sprite = sprite;
+                                       action?.Invoke(this);
+                                   },
+                                   path
+                                  );
         }
 
         public GameImage LoadImage(string path, bool isForceLocal = false){
-            var sprite = AssetSystem.Load<Sprite>(path);
+            var sprite = AssetsSystem.Load<Sprite>(path);
             this.sprite = sprite;
             return this;
         }

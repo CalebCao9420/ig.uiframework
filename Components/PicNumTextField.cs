@@ -112,7 +112,7 @@ namespace IG.Module.UI{
                     nowNum = Convert.ToInt32(numStr.Substring(index, 1));
                     item.Value.transform.SetParent(this.ShowCont.transform);
                     // GameAssetManager.LoadSprite (numPathList [nowNum], item.Value);
-                    var tmpSprite = AssetSystem.Load<Sprite>(NumPathList[nowNum]);
+                    var tmpSprite = AssetsSystem.Load<Sprite>(NumPathList[nowNum]);
                     item.Value.sprite = tmpSprite;
                 }
                 else{

@@ -15,18 +15,18 @@ namespace IG.Module.UI{
         private          int    _loadCount = 0;
 
         public void AsyncLoadImage(string path, Action<RawImage> action = null, bool isForceLocal = false){
-            AssetSystem.LoadAsync(
-                                  (o, oArg) => {
-                                      Texture tex = o as Texture;
-                                      this.texture = tex;
-                                      action?.Invoke(this);
-                                  },
-                                  path
-                                 );
+            AssetsSystem.LoadAsync(
+                                   (o, oArg) => {
+                                       Texture tex = o as Texture;
+                                       this.texture = tex;
+                                       action?.Invoke(this);
+                                   },
+                                   path
+                                  );
         }
 
         public GameRawImage LoadImage(string path, bool isForceLocal = false){
-            var tex = AssetSystem.Load<Texture>(path);
+            var tex = AssetsSystem.Load<Texture>(path);
             this.texture = tex;
             return this;
         }
@@ -42,13 +42,13 @@ namespace IG.Module.UI{
             }
             else{
                 _url = string.Empty;
-                AssetSystem.LoadAsync(
-                                      (o, oArg) => {
-                                          Texture tex = o as Texture;
-                                          this.texture = tex;
-                                      },
-                                      url
-                                     );
+                AssetsSystem.LoadAsync(
+                                       (o, oArg) => {
+                                           Texture tex = o as Texture;
+                                           this.texture = tex;
+                                       },
+                                       url
+                                      );
             }
 
             this.name = url;

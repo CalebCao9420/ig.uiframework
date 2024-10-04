@@ -10,7 +10,7 @@ namespace IG.Module.UI{
         public static void Show(GameObject caller, Transform parent){
             if (s_instance == null){
                 PrefabInfo prefabInfo = GamePrefabPaths.GetPath(typeof(CommonMaskController));
-                var        prefab     = AssetSystem.Load<GameObject>(prefabInfo.path);
+                var        prefab     = AssetsSystem.Load<GameObject>(prefabInfo.path);
                 var        obj        = GameObject.Instantiate(prefab);
                 obj.name   = prefab.name;
                 s_instance = obj.GetComponent<CommonMaskController>();
